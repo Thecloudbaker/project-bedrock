@@ -1,0 +1,7 @@
+terraform/.terraform/
+terraform/terraform.tfvars
+terraform/tfplan
+lambda/asset_processor.zip
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
