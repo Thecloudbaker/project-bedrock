@@ -1,0 +1,67 @@
+{
+  "assets_bucket_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "bedrock-assets-altsoe0253662"
+  },
+  "cart_service_role_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:iam::200546424603:role/project-bedrock-cart-service-role"
+  },
+  "cluster_endpoint": {
+    "sensitive": false,
+    "type": "string",
+    "value": "https://B1E76170B7421DF8162076E7082A3025.gr7.us-east-1.eks.amazonaws.com"
+  },
+  "cluster_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "project-bedrock-cluster"
+  },
+  "dev_view_access_key_id": {
+    "sensitive": true,
+    "type": "string",
+    "value": "AKIAS5ML7S4N4LKWLDWN"
+  },
+  "dev_view_console_password": {
+    "sensitive": true,
+    "type": "string",
+    "value": "6PO%VYEEN6{xpJ^d@Hvc"
+  },
+  "dev_view_secret_access_key": {
+    "sensitive": true,
+    "type": "string",
+    "value": "jaj2YvqhT+vnSfQg4dRzzj/rvHWDYmp8HRNwgTMT"
+  },
+  "dynamodb_table_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "project-bedrock-cart"
+  },
+  "kubeconfig_command": {
+    "sensitive": false,
+    "type": "string",
+    "value": "aws eks update-kubeconfig --region us-east-1 --name project-bedrock-cluster"
+  },
+  "mysql_endpoint": {
+    "sensitive": false,
+    "type": "string",
+    "value": "project-bedrock-mysql.c65eqkkkqgb8.us-east-1.rds.amazonaws.com"
+  },
+  "postgres_endpoint": {
+    "sensitive": false,
+    "type": "string",
+    "value": "project-bedrock-postgres.c65eqkkkqgb8.us-east-1.rds.amazonaws.com"
+  },
+  "region": {
+    "sensitive": false,
+    "type": "string",
+    "value": "us-east-1"
+  },
+  "vpc_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vpc-0b4053e80bdba98e9"
+  }
+}

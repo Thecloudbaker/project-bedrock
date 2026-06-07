@@ -1,0 +1,323 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog
+  namespace: retail-app
+  labels:
+    app: catalog
+    project: karatu-2025-capstone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: catalog
+  template:
+    metadata:
+      labels:
+        app: catalog
+    spec:
+      containers:
+        - name: catalog
+          image: public.ecr.aws/aws-containers/retail-store-sample-catalog:0.8.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials
+                  key: host
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials
+                  key: password
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials
+                  key: dbname
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "128m"
+            limits:
+              memory: "256Mi"
+              cpu: "256m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 45
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog
+  namespace: retail-app
+spec:
+  selector:
+    app: catalog
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cart
+  namespace: retail-app
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::200546424603:role/project-bedrock-cart-service-role
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart
+  namespace: retail-app
+  labels:
+    app: cart
+    project: karatu-2025-capstone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cart
+  template:
+    metadata:
+      labels:
+        app: cart
+    spec:
+      serviceAccountName: cart
+      containers:
+        - name: cart
+          image: public.ecr.aws/aws-containers/retail-store-sample-cart:0.8.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DYNAMODB_TABLE_NAME
+              value: "project-bedrock-cart"
+            - name: AWS_REGION
+              value: "us-east-1"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "128m"
+            limits:
+              memory: "256Mi"
+              cpu: "256m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 45
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cart
+  namespace: retail-app
+spec:
+  selector:
+    app: cart
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders
+  namespace: retail-app
+  labels:
+    app: orders
+    project: karatu-2025-capstone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orders
+  template:
+    metadata:
+      labels:
+        app: orders
+    spec:
+      containers:
+        - name: orders
+          image: public.ecr.aws/aws-containers/retail-store-sample-orders:0.8.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: host
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: password
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: dbname
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "128m"
+            limits:
+              memory: "256Mi"
+              cpu: "256m"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 45
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders
+  namespace: retail-app
+spec:
+  selector:
+    app: orders
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout
+  namespace: retail-app
+  labels:
+    app: checkout
+    project: karatu-2025-capstone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: checkout
+  template:
+    metadata:
+      labels:
+        app: checkout
+    spec:
+      containers:
+        - name: checkout
+          image: public.ecr.aws/aws-containers/retail-store-sample-checkout:0.8.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ORDERS_URL
+              value: "http://orders:8080"
+            - name: CART_URL
+              value: "http://cart:8080"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "128m"
+            limits:
+              memory: "256Mi"
+              cpu: "256m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 45
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: checkout
+  namespace: retail-app
+spec:
+  selector:
+    app: checkout
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: assets
+  namespace: retail-app
+  labels:
+    app: assets
+    project: karatu-2025-capstone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: assets
+  template:
+    metadata:
+      labels:
+        app: assets
+    spec:
+      containers:
+        - name: assets
+          image: public.ecr.aws/aws-containers/retail-store-sample-assets:0.8.0
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "64m"
+            limits:
+              memory: "128Mi"
+              cpu: "128m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: assets
+  namespace: retail-app
+spec:
+  selector:
+    app: assets
+  ports:
+    - port: 8080
+      targetPort: 8080
