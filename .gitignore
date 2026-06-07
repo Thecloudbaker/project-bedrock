@@ -5,3 +5,5 @@ lambda/asset_processor.zip
 *.tfstate
 *.tfstate.backup
 .terraform.lock.hcl
+terraform/.terraform/
+terraform/.terraform.lock.hcl
